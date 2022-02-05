@@ -1,0 +1,9 @@
+node_modules
+.idea
+
+#Hardhat files
+cache
+artifacts
+*.swp
+frontend/src/js/JogDial.js-master
+.DS_Store
