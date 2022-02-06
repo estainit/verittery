@@ -16,11 +16,16 @@ async function main() {
 
   // ethers is avaialble in the global scope
   const [deployer] = await ethers.getSigners();
+  // console.log("deployer", deployer);
+
   console.log(
     "Deploying the contracts with the account:",
     await deployer.getAddress()
   );
-  console.log("Account balance:", (await deployer.getBalance()).toString());
+
+  const balanceBeforeDeploy = await deployer.getBalance();
+  console.log("Account balance Before deploy:", ethers.utils.formatEther(balanceBeforeDeploy.toString()));
+  
   let contractsAddresses = {};
 
   const Token = await ethers.getContractFactory("Token");
@@ -38,6 +43,11 @@ async function main() {
   console.log("lottery address:", lottery.address);
   contractsAddresses["Lottery"] = lottery.address;
 
+  
+  const balanceAfterDeploy = await deployer.getBalance();
+  console.log("Account balance after deploy:", ethers.utils.formatEther(balanceAfterDeploy.toString()));
+  console.log("Deploy cost:", ethers.utils.formatEther((balanceBeforeDeploy-balanceAfterDeploy).toString()));
+  
   // We also save the contract's artifacts and address in the frontend directory
   saveFrontendContracts("Lottery");
 

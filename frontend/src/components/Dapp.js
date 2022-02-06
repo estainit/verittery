@@ -32,6 +32,7 @@ import { doSha256, getNow, getStateClasses } from "./VUtils.js";
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
 // to use when deploying to other networks.
 const HARDHAT_NETWORK_ID = "31337";
+const ROPSTEN_TEST_NETWORK_ID = "3";
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -76,6 +77,9 @@ export class Dapp extends React.Component {
     buyersBalance: {},
     commissionAddress: "",
     currentGameCommission: 0,
+    IDLE_PLAY_TIME: 10, // if in 10 minutes no new player join to game (no new ticket to be sold), the game goes to Revealing phase.
+    reminedTimeToRevealing: 0,
+    lockedForChangeGameState: false,
   };
 
   constructor(props) {
@@ -93,7 +97,6 @@ export class Dapp extends React.Component {
   }
 
   updateTicketsInfo = async () => {
-    // return;
     if (!this._lottery) return;
 
     let soldTickets = await this._lottery.extractTickets();
@@ -123,6 +126,10 @@ export class Dapp extends React.Component {
     prizeAmountInToken = prizeAmountInToken.toString();
     soldTicketsCount = soldTicketsCount.toString();
 
+    let reminedTimeToRevealing =
+      this.state.IDLE_PLAY_TIME * 60 -
+      (lastBlockTimestamp - lastTicketSellTime);
+
     this.setState({
       buyersBalance,
       gameState,
@@ -131,8 +138,18 @@ export class Dapp extends React.Component {
       prizeAmountInToken,
       lastBlockTimestamp,
       lastTicketSellTime,
+      reminedTimeToRevealing,
     });
     this.setState({ prizeAmountInDollar: prizeAmountInToken * 0.00000014 });
+
+    if (reminedTimeToRevealing < 1 && gameState == 0) {
+      if (!this.state.lockedForChangeGameState) {
+        console.log("It is time to change the game state to Revealing");
+        this.setState({ lockedForChangeGameState: true });
+        // await this._lottery.changeGameState("Revealing");
+        this.setState({ lockedForChangeGameState: false });
+      }
+    }
   };
 
   render() {
@@ -187,6 +204,7 @@ export class Dapp extends React.Component {
             selectedAddress={""}
             lastBlockTimestamp={this.state.lastBlockTimestamp}
             lastTicketSellTime={this.state.lastTicketSellTime}
+            reminedTimeToRevealing={this.state.reminedTimeToRevealing}
           />
         </div>
       );
@@ -213,6 +231,7 @@ export class Dapp extends React.Component {
               selectedAddress={this.state.selectedAddress}
               lastBlockTimestamp={this.state.lastBlockTimestamp}
               lastTicketSellTime={this.state.lastTicketSellTime}
+              reminedTimeToRevealing={this.state.reminedTimeToRevealing}
             />
           </div>
         </div>
@@ -632,7 +651,11 @@ export class Dapp extends React.Component {
 
   // This method checks if Metamask selected network is Localhost:8545
   _checkNetwork() {
-    if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID) {
+    const networkID = window.ethereum.networkVersion;
+    if (
+      networkID === HARDHAT_NETWORK_ID ||
+      networkID === ROPSTEN_TEST_NETWORK_ID
+    ) {
       return true;
     }
 

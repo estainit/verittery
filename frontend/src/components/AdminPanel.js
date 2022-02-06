@@ -42,8 +42,8 @@ export function AdminPanel({
         <table>
           <tbody>
             <tr>
+              <td>Game State {gameState}</td>
               <td>
-                <td>Game State {gameState}</td>
                 <table>
                   <tbody>
                     <tr>
@@ -139,7 +139,7 @@ export function AdminPanel({
                     </tr>
                   </tbody>
                 </table>
-              </td>{" "}
+              </td>
             </tr>
             <tr>
               <td>

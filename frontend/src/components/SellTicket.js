@@ -14,7 +14,7 @@ export function SellTicket({ onBuyTicket }) {
   return (
     <div className="bg-lightp-3 m-2 p-2 rounded bg-info text-dark position-relative">
       <center>
-        <h4 className="translate-middle">Verittery (Verrifiable Lottery)</h4>
+        <h4 className="translate-middle">Verittery (Verifiable Lottery)</h4>
       </center>
       <div>
         <table>

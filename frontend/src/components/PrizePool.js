@@ -17,6 +17,7 @@ export function PrizePool({
   selectedAddress,
   lastBlockTimestamp,
   lastTicketSellTime,
+  reminedTimeToRevealing,
   revealTicketLuckyNumber,
   buyersBalance,
 }) {
@@ -33,6 +34,7 @@ export function PrizePool({
 
   if (!soldTickets) return "Not sold any ticket yet!";
 
+  let reminedTitle = `${lastBlockTimestamp}-${lastTicketSellTime}`;
   let winnerTicketHash = "";
   const theWinner = getLastWinner();
   if (theWinner) {
@@ -70,7 +72,6 @@ export function PrizePool({
         (winnerIndex + 1) +
         ")"
     );
-    
   };
 
   const resetNumberEffects = () => {
@@ -124,99 +125,112 @@ export function PrizePool({
   return (
     <div>
       <div className="position-relative">
-        <div className="translate-middle-x">
-          The only Pick 4 Verrifiable Lottery
+        <div className="translate-middle-x display-4 p-3 mt-5 mb-5 p-2 bg-danger text-white">
+          The only "Pick 4" Verifiable Lottery in the world
+        </div>
+        <div className="translate-middle-x display-6 bg-success p-2">
+          Prize Amount:{" "}
+          {ethers.utils.formatEther(prizeAmountInToken).toString()} in ETH ={" "}
+          {prizeAmountInDollar} $
+        </div>
+        <div className="translate-middle-x display-6">
+          {soldTickets.length} Ticket(s) sold:{" "}
         </div>
       </div>
       <div>
-        Prize Amount: {ethers.utils.formatEther(prizeAmountInToken).toString()}{" "}
-        in ETH = {prizeAmountInDollar} $
-      </div>
-      <h2> {soldTickets.length} Ticket(s) sold: </h2>
-      <h2> {lastBlockTimestamp - lastTicketSellTime} Remined </h2>
-      <h3> {gameState === 1 ? "Reveal your ticket number!" : ""} </h3>
-      <table className="table table-primary table-striped">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Hash</th>
-            <th scope="col">Date</th>
-            <th scope="col">Buyer</th>
-            <th scope="col">Lucky Numbers</th>
-          </tr>
-        </thead>
-        <tbody>
-          {soldTickets.map((elm) => (
-            <tr key={elm._id.toNumber()}>
-              <td style={{ backgroundColor: "#" + elm.buyer.substr(2, 8) }}>
-                {elm._id.toNumber()}
-                {winnerTicketHash === elm.ticketHash ? "Winner" : " "}
-              </td>
-              <td>{elm.ticketHash.substr(0, 6)}</td>
-              <td>{elm.buyDate}</td>
-              <td title={elm.buyer}>
-                {elm.buyer.substr(0, 6)}...{elm.buyer.substr(38, 4)}{" "}
-                {elm.playerAliasName}
-                {selectedAddress.toString().toLowerCase() ===
-                elm.buyer.toString().toLowerCase()
-                  ? " (You) "
-                  : ""}
-                {buyersBalance[elm.buyer]
-                  ? ethers.utils
-                      .formatEther(buyersBalance[elm.buyer])
-                      .toString()
-                      .substring(0, 8)
-                  : ""}
-              </td>
+        {gameState === 0 ? (
+          <h2 title={reminedTitle}>
+            {" "}
+            {reminedTimeToRevealing} Seconds Remined to Revealing Phase{" "}
+          </h2>
+        ) : (
+          ""
+        )}
 
-              <td>
-                <div className={ticketsClass[elm._id.toNumber()]}>
-                  {elm.ticketLuckyNumber.toString() !== "0" ? (
-                    elm.ticketLuckyNumber.toString()
-                  ) : selectedAddress.toString().toLowerCase() ===
-                    elm.buyer.toString().toLowerCase() ? (
-                    <button
-                      disabled={gameState === 1 ? "" : "disabled"}
-                      type="button"
-                      className="btn btn-warning btn btn-sm"
-                      onClick={() => {
-                        revealTicketLuckyNumber(
-                          elm.ticketHash,
-                          findTicketByHash(elm.ticketHash).ticketLuckyNumber,
-                          findTicketByHash(elm.ticketHash).theSalt
-                        );
-                      }}
-                    >
-                      Reveal ticket number
-                    </button>
-                  ) : (
-                    "..."
-                  )}
-                </div>
-              </td>
+        <h3> {gameState === 1 ? "Reveal your ticket number!" : ""} </h3>
+        <table className="table table-primary table-striped">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Hash</th>
+              <th scope="col">Date</th>
+              <th scope="col">Buyer</th>
+              <th scope="col">Lucky Numbers</th>
             </tr>
-          ))}
-          {gameState === 1 ? (
-            <tr key="Summary">
-              <td style={{ backgroundColor: "#f00" }} colSpan={4}>
-                <div>{dPMsg}</div>
-              </td>
-              <td>
-                <button
-                  disabled={gameState === 1 ? "" : "disabled"}
-                  type="button"
-                  className="btn btn-warning btn btn-sm"
-                  onClick={showDrawing}
-                >
-                  Represent the draw process
-                </button>
-              </td>
-            </tr>
-          ) : (
-            <div> </div>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {soldTickets.map((elm) => (
+              <tr key={elm._id.toNumber()}>
+                <td style={{ backgroundColor: "#" + elm.buyer.substr(2, 8) }}>
+                  {elm._id.toNumber()}
+                  {winnerTicketHash === elm.ticketHash ? "Winner" : " "}
+                </td>
+                <td>{elm.ticketHash.substr(0, 6)}</td>
+                <td>{elm.buyDate}</td>
+                <td title={elm.buyer}>
+                  {elm.buyer.substr(0, 6)}...{elm.buyer.substr(38, 4)}{" "}
+                  {elm.playerAliasName}
+                  {selectedAddress.toString().toLowerCase() ===
+                  elm.buyer.toString().toLowerCase()
+                    ? " (You) "
+                    : ""}
+                  {buyersBalance[elm.buyer]
+                    ? ethers.utils
+                        .formatEther(buyersBalance[elm.buyer])
+                        .toString()
+                        .substring(0, 8)
+                    : ""}
+                </td>
+
+                <td>
+                  <div className={ticketsClass[elm._id.toNumber()]}>
+                    {elm.ticketLuckyNumber.toString() !== "0" ? (
+                      elm.ticketLuckyNumber.toString()
+                    ) : selectedAddress.toString().toLowerCase() ===
+                      elm.buyer.toString().toLowerCase() ? (
+                      <button
+                        disabled={gameState === 1 ? "" : "disabled"}
+                        type="button"
+                        className="btn btn-warning btn btn-sm"
+                        onClick={() => {
+                          revealTicketLuckyNumber(
+                            elm.ticketHash,
+                            findTicketByHash(elm.ticketHash).ticketLuckyNumber,
+                            findTicketByHash(elm.ticketHash).theSalt
+                          );
+                        }}
+                      >
+                        Reveal ticket number
+                      </button>
+                    ) : (
+                      "..."
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {gameState === 1 ? (
+              <tr key="Summary">
+                <td style={{ backgroundColor: "#f00" }} colSpan={4}>
+                  <div>{dPMsg}</div>
+                </td>
+                <td>
+                  <button
+                    disabled={gameState === 1 ? "" : "disabled"}
+                    type="button"
+                    className="btn btn-warning btn btn-sm"
+                    onClick={showDrawing}
+                  >
+                    Represent the draw process
+                  </button>
+                </td>
+              </tr>
+            ) : (
+              <tr></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       <div className="badge bg-primary text-light">
         Pari-mutuel: each 100$ one more winner!
       </div>

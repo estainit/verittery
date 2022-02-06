@@ -22,6 +22,18 @@ task("accountsB", "Prints accounts", async (_, { web3 }) => {
   }
 });
 
+// Go to https://www.alchemyapi.io, sign up, create
+// a new App in its dashboard, and replace "KEY" with its key
+// HTTP:         https://eth-ropsten.alchemyapi.io/v2/hgWDQQsicvBZuNVBU8LYmwc8xSFeGXP8
+// WEBSOCKETS:   wss://eth-ropsten.alchemyapi.io/v2/hgWDQQsicvBZuNVBU8LYmwc8xSFeGXP8
+const ALCHEMY_API_KEY = "hgWDQQsicvBZuNVBU8LYmwc8xSFeGXP8";
+
+// Replace this private key with your Ropsten account private key
+// To export your private key from Metamask, open Metamask and
+// go to Account Details > Export Private Key
+// Be aware of NEVER putting real Ether into testing accounts
+const ROPSTEN_PRIVATE_KEY = "3adcd63a88ce96920808bf69d3a916d43999151fb0696ae5129352cb9e013491";
+
 module.exports = {
   solidity: "0.8.0",
 
@@ -37,6 +49,11 @@ module.exports = {
         interval: 5000,
       },
       chainId: 31337,
+    },
+
+    ropsten: {
+      url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+      accounts: [`${ROPSTEN_PRIVATE_KEY}`],
     },
   },
 
