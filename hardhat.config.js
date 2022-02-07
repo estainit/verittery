@@ -1,6 +1,14 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
 
+require("dotenv").config();
+const {
+  ROPSTEN_API_URL,
+  ROPSTEN_PRIVATE_KEY,
+  ROPSTEN_API_URL,
+  ALCHEMY_API_KEY,
+} = process.env;
+
 // The next line is part of the sample project, you don't need it in your
 // project. It imports a Hardhat task definition, that can be used for
 // testing the frontend.
@@ -26,13 +34,6 @@ task("accountsB", "Prints accounts", async (_, { web3 }) => {
 // a new App in its dashboard, and replace "KEY" with its key
 // HTTP:         https://eth-ropsten.alchemyapi.io/v2/hgWDQQsicvBZuNVBU8LYmwc8xSFeGXP8
 // WEBSOCKETS:   wss://eth-ropsten.alchemyapi.io/v2/hgWDQQsicvBZuNVBU8LYmwc8xSFeGXP8
-const ALCHEMY_API_KEY = "hgWDQQsicvBZuNVBU8LYmwc8xSFeGXP8";
-
-// Replace this private key with your Ropsten account private key
-// To export your private key from Metamask, open Metamask and
-// go to Account Details > Export Private Key
-// Be aware of NEVER putting real Ether into testing accounts
-const ROPSTEN_PRIVATE_KEY = "3adcd63a88ce96920808bf69d3a916d43999151fb0696ae5129352cb9e013491";
 
 module.exports = {
   solidity: "0.8.0",
@@ -52,7 +53,7 @@ module.exports = {
     },
 
     ropsten: {
-      url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+      url: `${ROPSTEN_API_URL}${ALCHEMY_API_KEY}`,
       accounts: [`${ROPSTEN_PRIVATE_KEY}`],
     },
   },

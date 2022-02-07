@@ -7,3 +7,4 @@ artifacts
 *.swp
 frontend/src/js/JogDial.js-master
 .DS_Store
+.env
