@@ -40,4 +40,4 @@ if (A > B){
 
 ```
 
-**Happy _Randomness_!**
+**Happy _Verifiable Randomness_!**
