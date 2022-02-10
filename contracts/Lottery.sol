@@ -4,6 +4,8 @@
 // It will be used by the Solidity compiler to validate its version.
 pragma solidity ^0.8.0;
 
+import "./Admin.sol";
+
 // We import this library to be able to use console.log
 // import "hardhat/console.sol";
 
@@ -11,7 +13,6 @@ pragma solidity ^0.8.0;
 contract Lottery {
     string public name = "The Simplest and clearest Verifiable Lottery";
     address payable public owner;
-    address payable public contractPledgingAddress;
     address payable public contractCommissionAddress;
     uint8 public contractCommissionRate = 71; // 7.1 percent
     enum GameState {
@@ -78,7 +79,6 @@ contract Lottery {
      */
     constructor() {
         owner = payable(msg.sender);
-        contractPledgingAddress = owner;
         contractCommissionAddress = owner;
 
         soldTicketsCount = 0;
@@ -144,13 +144,6 @@ contract Lottery {
         return contractCommissionAddress;
     }
 
-    function setContractPledgingAddress(address payable _newPledgingAddress)
-        external
-        onlyOwner
-    {
-        contractPledgingAddress = _newPledgingAddress;
-    }
-
     function changeTicketPrice(uint256 _oneTicketPriceByWei)
         external
         onlyOwner
@@ -214,22 +207,6 @@ contract Lottery {
                 "the hash already existed!",
                 playerAliasName
             );
-        }
-
-        // transfer ticket price to owner
-        // payable(owner()).transfer(msg.value);
-
-        bool sent = contractPledgingAddress.send(msg.value); // transfer pledged amounts to owner
-        if (!sent) {
-            emit LogTicketSold(
-                false,
-                msg.sender,
-                soldTicketsCount,
-                ticketHash,
-                "Pledging failed",
-                playerAliasName
-            );
-            return;
         }
 
         soldTicketsCount++;
@@ -487,6 +464,7 @@ contract Lottery {
         if (shouldPayToWinner) {
             assert(owner == msg.sender);
 
+            theWinner.buyer.transfer(getNetPrizeAmountInToken());
             // bool sent = withdrawWinner({
             //     value:getNetPrizeAmountInToken()
             // }); // transfer pledged amounts to owner
@@ -552,7 +530,6 @@ contract Lottery {
                 if (winnerLuckyNumber == candidNumber) {
                     // the first accurance of the equal number is winner
                     //
-
                     // bytes memory winnerTicketHash = fromHex(
                     //     tickets[winnerTicketIndex].ticketHash
                     // );

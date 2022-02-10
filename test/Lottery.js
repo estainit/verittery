@@ -315,7 +315,6 @@ describe("Lottery contract", function () {
   // You can nest describe calls to create subsections.
   describe("Check winning algorithm", async () => {
     it("Should buy 2 tickets (lucky numbers 10 and 30) and pick winner and pay rewards to winner", async () => {
-      await hardhatLottery.setContractPledgingAddress(addr2.address); // change pledge account address from owner to addr2
 
       // accounts balance checking
       // ownerBalanceBefore = ethers.BigNumber.from(
@@ -361,7 +360,8 @@ describe("Lottery contract", function () {
         expect(soldTicketsCount.toString()).to.equal("0");
         expect(prizeAmountInToken.toString()).to.equal("0");
       }
-      const tx1 = await hardhatLottery.buyATicket(
+
+      const tx1 = await hardhatLottery.connect(addr3).buyATicket(
         tHash1,
         tBDate1,
         1,
@@ -388,7 +388,8 @@ describe("Lottery contract", function () {
 
       {
         const soldTickets = await hardhatLottery.extractTickets();
-        expect(soldTickets[0].buyer).to.equal(soldTickets[1].buyer);
+        expect(soldTickets[0].buyer).to.equal(addr3.address);
+        expect(soldTickets[1].buyer).to.equal(owner.address);
       }
 
       // change game state to revealing
@@ -409,7 +410,7 @@ describe("Lottery contract", function () {
         // console.log("soldTickets", soldTickets);
         expect(soldTickets[0].ticketLuckyNumber).to.equal(tLuckyNumber1);
       }
-
+      
       // reveal the lucky number for ticket 2
       {
         await hardhatLottery.revealTicketLuckyNumber(
@@ -447,15 +448,14 @@ describe("Lottery contract", function () {
 
       // pick the winner
       {
-        const winner = await hardhatLottery.pickWinner(false);
+        const winner = await hardhatLottery.pickWinner(true);
         // console.log("winner ", winner);
         const winnerEvt = await winner.wait();
         //console.log("winnerEvt ", winnerEvt);
         expect(winnerEvt.events[0].args.stat).to.equal(true);
-        expect(winnerEvt.events[0].args.stat).to.equal(true);
 
         const finalWinner = winnerEvt.events[0].args.winner;
-        expect(finalWinner.buyer).to.equal(owner.address);
+        expect(finalWinner.buyer).to.equal(addr3.address);
         expect(finalWinner.ticketLuckyNumber.toNumber()).to.equal(2);
 
         console.log(
@@ -531,7 +531,6 @@ describe("Lottery contract", function () {
       let ownerBalanceBefore = ethers.BigNumber.from(
         await ethers.provider.getBalance(owner.address)
       );
-      await hardhatLottery.setContractPledgingAddress(addr2.address); // change pledge account address from owner to addr2
 
       const tBDate1 = "2020-11-27 18:39:01.217";
       const tBDate2 = "2020-11-27 18:42:01.217";

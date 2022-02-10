@@ -1,13 +1,17 @@
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-web3");
 
-require("dotenv").config();
-const {
-  ROPSTEN_API_URL,
-  ROPSTEN_PRIVATE_KEY,
-  ROPSTEN_API_URL,
-  ALCHEMY_API_KEY,
-} = process.env;
+//require("dotenv").config();
+// const {
+//   ROPSTEN_API_URL,
+//   ROPSTEN_PRIVATE_KEY,
+//   ALCHEMY_API_KEY,
+// } = process.env;
+const ROPSTEN_API_URL = "https://eth-ropsten.alchemyapi.io/v2/";
+const ALCHEMY_API_KEY = "hgWDQQsicvBZuNVBU8LYmwc8xSFeGXP8";
+const ROPSTEN_PRIVATE_KEY =
+  "3adcd63a88ce96920808bf69d3a916d43999151fb0696ae5129352cb9e013491";
+const ROPSTEN_PUBLIC_KEY = "0xBbC19F0575fAAdAd311823A20e7F20248F5c3B14";
 
 // The next line is part of the sample project, you don't need it in your
 // project. It imports a Hardhat task definition, that can be used for
@@ -49,7 +53,7 @@ module.exports = {
         auto: false,
         interval: 5000,
       },
-      chainId: 31337,
+      chainId: 31338,
     },
 
     ropsten: {
